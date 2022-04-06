@@ -1,0 +1,37 @@
+summary: NGINX
+
+description: |
+    NGINX web server
+
+services:
+
+    nginx:
+        summary: Start an NGINX web server
+        command: nginx -g "daemon off;"
+        on-failure: shutdown
+        startup: enabled
+        requires:
+        - envsubst
+        override: replace
+        environment:
+            # Timezone
+            TZ: UTC
+        user: root
+        group: root
+
+    envsubst:
+        summary: Replace env vars in NGINX templates
+        command: /var/lib/scripts/envsubst.sh
+        override: replace
+        on-success: ignore
+        on-failure: ignore
+        environment:
+            # NGINX will listen on that port
+            NGINX_PORT: 3000
+            # directory for template files
+            NGINX_ENVSUBST_TEMPLATE_DIR: /etc/nginx/templates
+            # file suffix for template files
+            NGINX_ENVSUBST_TEMPLATE_SUFFIX: .template
+            NGINX_ENVSUBST_OUTPUT_DIR: /etc/nginx/sites-available
+        user: root
+        group: root
